@@ -1,0 +1,170 @@
+# Hausgeist Rules Engine
+# These rules are evaluated by OpenClaw on a schedule (weekly heartbeat)
+# and on certain triggers (item updates)
+
+# ============================================
+# CHORE RULES
+# ============================================
+
+chores:
+  - name: "Recurring chore missed"
+    description: "Remind when a recurring chore hasn't been done"
+    trigger:
+      type: "chore"
+      recurring: true
+      last_completed: "> 7 days ago"
+    action:
+      type: "remind"
+      message: "{{owner}}'s recurring task '{{title}}' hasn't been done in a week!"
+    
+  - name: "Daily chores incomplete"
+    description: "Evening reminder for incomplete daily tasks"
+    schedule: "daily at 18:00"
+    trigger:
+      type: "chore"
+      frequency: "daily"
+      status: "todo"
+      due_date: "today"
+    action:
+      type: "remind"
+      message: "{{owner}} still has {{count}} tasks left for today: {{titles}}"
+
+  - name: "Weekly chore summary"
+    description: "Sunday summary of completed chores"
+    schedule: "sunday at 10:00"
+    action:
+      type: "summary"
+      message: "Weekly chore report: {{completed_count}} tasks done! {{top_performer}} was the star this week ⭐"
+
+# ============================================
+# INVENTORY RULES
+# ============================================
+
+inventory:
+  - name: "Shoes age check"
+    description: "Kids outgrow shoes every 4-6 months"
+    schedule: "weekly"
+    trigger:
+      type: "inventory"
+      category: "shoes"
+      status: "have"
+      age: "> 5 months"
+    action:
+      type: "suggest"
+      message: "{{owner}}'s {{title}} are {{age}} old. Time to check if they still fit?"
+      auto_action: "If outgrown, move to 'outgrown' and add new size to shopping list"
+
+  - name: "Clothes season check"
+    description: "Check seasonal clothes fit before season starts"
+    schedule: "march 1, september 1"
+    trigger:
+      type: "inventory"
+      category: "clothes"
+      status: "have"
+    action:
+      type: "suggest"
+      message: "Season change coming! Time to check if {{owner}}'s clothes still fit."
+
+  - name: "Hand-me-down opportunity"
+    description: "When item is outgrown, check if younger sibling can use it"
+    trigger:
+      type: "inventory"
+      status: "outgrown"
+      event: "status_changed"
+    action:
+      type: "suggest"
+      message: "{{owner}} outgrew {{title}}. Could {{younger_sibling}} use it?"
+
+  - name: "Outgrown item action"
+    description: "Prompt for action on outgrown items"
+    trigger:
+      type: "inventory"
+      status: "outgrown"
+      age_in_status: "> 14 days"
+    action:
+      type: "remind"
+      message: "{{title}} has been in 'outgrown' for 2 weeks. Donate, sell, or hand down?"
+
+# ============================================
+# DOCUMENT RULES
+# ============================================
+
+documents:
+  - name: "Document expiring soon (90 days)"
+    trigger:
+      type: "document"
+      status: "valid"
+      due_date: "within 90 days"
+    action:
+      type: "alert"
+      message: "{{owner}}'s {{title}} expires in {{days_until}} days. Start renewal process?"
+      auto_action: "Move to 'expiring-soon'"
+
+  - name: "Document expiring urgent (30 days)"
+    trigger:
+      type: "document"
+      status: "expiring-soon"
+      due_date: "within 30 days"
+    action:
+      type: "alert"
+      priority: "high"
+      message: "⚠️ URGENT: {{owner}}'s {{title}} expires in {{days_until}} days!"
+
+  - name: "Vaccination schedule"
+    description: "Check vaccination due dates"
+    trigger:
+      type: "document"
+      category: "vaccination"
+      due_date: "within 30 days"
+    action:
+      type: "remind"
+      message: "{{owner}}'s {{title}} is due. Schedule appointment?"
+
+# ============================================
+# PROACTIVE SUGGESTIONS
+# ============================================
+
+suggestions:
+  - name: "Birthday preparation"
+    trigger:
+      person_birthday: "within 30 days"
+    action:
+      type: "suggest"
+      message: "{{person}}'s birthday is in {{days}} days! Want me to create a prep checklist?"
+      tasks:
+        - "Plan party / activity"
+        - "Create guest list"
+        - "Order cake"
+        - "Buy presents"
+        - "Send invitations"
+
+  - name: "Weekend activity"
+    schedule: "thursday at 12:00"
+    action:
+      type: "suggest"
+      message: "Weekend coming! Any family activities to plan?"
+
+# ============================================
+# WEEKLY HEARTBEAT
+# ============================================
+
+heartbeat:
+  schedule: "sunday at 09:00"
+  include:
+    - "chores.weekly_summary"
+    - "inventory (status=outgrown)"
+    - "inventory (age > 5 months, category=shoes)"
+    - "documents (expiring within 90 days)"
+    - "suggestions.birthday_check"
+  format: |
+    👻 Hausgeist Weekly Report
+    
+    📋 Chores: {{chore_summary}}
+    
+    👕 Inventory alerts: {{inventory_alerts}}
+    
+    📄 Documents: {{document_alerts}}
+    
+    💡 Suggestions: {{suggestions}}
+    
+    Have a great week!

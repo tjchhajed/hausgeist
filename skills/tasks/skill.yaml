@@ -1,0 +1,118 @@
+name: hausgeist-tasks
+description: |
+  Family task management skill for Hausgeist.
+  Manages chores, assigns to family members, tracks completion.
+version: 0.1.0
+author: Hausgeist
+
+# What triggers this skill
+triggers:
+  patterns:
+    - "add task"
+    - "add chore"
+    - "create task"
+    - "{person} needs to"
+    - "{person} should"
+    - "finished"
+    - "completed"
+    - "done with"
+    - "mark {task} as done"
+    - "{person} did"
+    - "what's left"
+    - "tasks for today"
+    - "open tasks"
+    - "show chores"
+    - "how did {person} do"
+    - "chore summary"
+    - "weekly report"
+
+# Required integrations
+requires:
+  - notion
+
+# Environment variables needed
+env:
+  - NOTION_API_KEY
+  - NOTION_DATABASE_ID
+
+# Skill configuration
+config:
+  # Family members (customize for your family)
+  family_members:
+    - name: Ira
+      birthday: 2022-03-15  # Adjust to real date
+      color: "#FF6B6B"
+    - name: Isha
+      birthday: 2025-01-10  # Adjust to real date
+      color: "#4ECDC4"
+    - name: Papa
+      color: "#45B7D1"
+    - name: Mama
+      color: "#96CEB4"
+    - name: Family
+      color: "#FFEAA7"
+  
+  # Points system
+  points:
+    default: 5
+    by_difficulty:
+      easy: 5
+      medium: 10
+      hard: 20
+    bonus:
+      streak_7_days: 50
+      all_tasks_complete: 25
+  
+  # Default task settings
+  defaults:
+    status: todo
+    type: chore
+    recurring: false
+  
+  # Celebration emojis
+  emojis:
+    complete: "✅"
+    celebrate: "🎉"
+    streak: "🔥"
+    star: "⭐"
+    ghost: "👻"
+
+# Scheduled actions
+schedules:
+  - name: evening_reminder
+    cron: "0 18 * * *"  # 6pm daily
+    action: remind_incomplete_daily_tasks
+  
+  - name: weekly_summary
+    cron: "0 10 * * 0"  # 10am Sunday
+    action: send_weekly_summary
+
+# Skill capabilities
+capabilities:
+  create_task:
+    description: Add a new task for a family member
+    parameters:
+      - title (required)
+      - owner (required)
+      - recurring (optional, default: false)
+      - frequency (optional: daily, weekly, monthly)
+      - due_date (optional)
+      - points (optional, default: 5)
+  
+  complete_task:
+    description: Mark a task as done
+    parameters:
+      - task_identifier (required, can be title or partial match)
+      - owner (optional, inferred if possible)
+  
+  list_tasks:
+    description: Show open tasks
+    parameters:
+      - owner (optional, shows all if not specified)
+      - timeframe (optional: today, week, all)
+  
+  task_summary:
+    description: Show completion statistics
+    parameters:
+      - owner (optional)
+      - timeframe (optional: week, month, all)
