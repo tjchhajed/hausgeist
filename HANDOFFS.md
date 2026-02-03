@@ -6,9 +6,9 @@ This file tracks dependencies and communication between agents.
 
 | Agent | Status | Blocking |
 |-------|--------|----------|
-| Notion Agent | 🟢 v0.1 Complete | — |
-| Skills Agent | 🔴 Not started | — |
-| Rules Agent | 🔴 Not started | — |
+| Notion Agent | 🔴 Not started | — |
+| Skills Agent | 🔴 Not started | Notion Agent |
+| Rules Agent | 🔴 Not started | Notion Agent |
 
 ## Dependency Graph
 
@@ -33,54 +33,44 @@ This file tracks dependencies and communication between agents.
 
 ## Handoff Log
 
-### 2026-02-03 Notion Agent → Skills Agent
+### [Date] Notion Agent → Skills Agent
 
-**Status:** ✅ Complete
+**Status:** ⏳ Pending
 
-**Available imports:**
+**When ready, Skills Agent can use:**
 ```typescript
-import {
-  createTask,
+import { 
+  createTask, 
   getTask,
-  completeTask,
-  updateTaskStatus,
-  deleteTask,
+  completeTask, 
   getTasksForOwner,
   getTasksForToday,
   getOpenTasks,
-  getTasksDoneThisWeek,
-  getWeeklyStats,
-  getOverdueTasks
-} from '../notion';
+  getTasksDoneThisWeek
+} from '../notion/tasks';
 ```
 
 **Notes:**
-- Call `initNotion()` once at startup before using other functions
-- Owner names must match Notion select options exactly (case-sensitive)
-- `createTask()` requires `{ title, owner }` at minimum
-- `getWeeklyStats()` returns `{ completed, totalPoints, tasks }`
-- All functions throw `NotionError` on failure
+- (Add notes when implementation is complete)
 
 ---
 
-### 2026-02-03 Notion Agent → Rules Agent
+### [Date] Notion Agent → Rules Agent
 
-**Status:** ✅ v0.1 Complete (Tasks only)
+**Status:** ⏳ Pending
 
-**Available imports:**
+**When ready, Rules Agent can use:**
 ```typescript
-import {
+import { 
   getTasksDoneThisWeek,
-  getWeeklyStats,
-  getOverdueTasks,
-  getOpenTasks
-} from '../notion';
+  getItemsByAge,
+  getOutgrownItems,
+  getExpiringDocuments
+} from '../notion/queries';
 ```
 
 **Notes:**
-- Inventory/document queries (`getOutgrownItems`, `getExpiringDocuments`) not yet implemented (v0.2/v0.3)
-- `getWeeklyStats(owner?)` returns `{ completed, totalPoints, tasks }` for heartbeat summaries
-- `getOverdueTasks(owner?)` for reminder rules
+- (Add notes when implementation is complete)
 
 ---
 
