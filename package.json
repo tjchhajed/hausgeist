@@ -7,13 +7,20 @@
     "build": "tsc",
     "start": "node dist/index.js",
     "dev": "ts-node src/index.ts",
-    "test:notion": "ts-node src/notion/test.ts"
+    "test:notion": "ts-node src/notion/test.ts",
+    "setup:notion": "ts-node scripts/setup-notion.ts",
+    "setup:notion:with-samples": "ts-node scripts/setup-notion.ts --samples",
+    "skill:tasks": "ts-node skills/tasks/index.ts",
+    "test:rules": "ts-node src/rules/test.ts",
+    "heartbeat": "ts-node -e \"import{runWeeklyHeartbeat}from'./src/rules';runWeeklyHeartbeat().then(console.log)\""
   },
   "dependencies": {
     "@notionhq/client": "^2.2.0",
-    "dotenv": "^16.3.1"
+    "dotenv": "^16.3.1",
+    "js-yaml": "^4.1.1"
   },
   "devDependencies": {
+    "@types/js-yaml": "^4.0.9",
     "@types/node": "^20.10.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.3.0"
