@@ -1,0 +1,33 @@
+{
+  "id": "hausgeist",
+  "name": "Hausgeist",
+  "description": "Family operating system — task management, inventory, documents",
+  "version": "0.1.0",
+  "openclaw": {
+    "extensions": ["./plugin.ts"]
+  },
+  "skills": ["skills/tasks"],
+  "configSchema": {
+    "type": "object",
+    "properties": {
+      "notionApiKey": {
+        "type": "string",
+        "description": "Notion integration API key"
+      },
+      "notionDatabaseId": {
+        "type": "string",
+        "description": "Notion database ID for Hausgeist"
+      }
+    },
+    "required": ["notionApiKey", "notionDatabaseId"]
+  },
+  "uiHints": {
+    "notionApiKey": {
+      "label": "Notion API Key",
+      "sensitive": true
+    },
+    "notionDatabaseId": {
+      "label": "Notion Database ID"
+    }
+  }
+}

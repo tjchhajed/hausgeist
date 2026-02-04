@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@notionhq/client": "^2.2.0",
+    "@sinclair/typebox": "^0.34.48",
     "dotenv": "^16.3.1",
     "js-yaml": "^4.1.1"
   },
